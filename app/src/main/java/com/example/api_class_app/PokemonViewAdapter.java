@@ -35,9 +35,9 @@ public class PokemonViewAdapter extends RecyclerView.Adapter<PokemonViewHolder>{
     public void onBindViewHolder(@NonNull PokemonViewHolder holder, int position) {
         final String name = pokeList.get(position).getName();
 
-        holder.name.setText(pokeList.get(position).getName());
-        holder.height.setText(String.valueOf(pokeList.get(position).getHeight()));
-        holder.weight.setText(String.valueOf(pokeList.get(position).getWeight()));
+        holder.name.setText(pokeList.get(position).getName().substring(0, 1).toUpperCase() + pokeList.get(position).getName().substring(1));
+        holder.height.setText("Altura: " + String.valueOf(pokeList.get(position).getHeight()/10) + "m");
+        holder.weight.setText("Peso: " + String.valueOf(pokeList.get(position).getWeight()/10) + "kg");
         Glide.with(context).load(pokeList.get(position).getSprites().front_default).into(holder.pokeImg);
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {

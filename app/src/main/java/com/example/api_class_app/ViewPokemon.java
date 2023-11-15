@@ -45,7 +45,8 @@ public class ViewPokemon extends AppCompatActivity {
         back.setOnClickListener(goBack);
 
         Intent intent = getIntent();
-        name.setText(intent.getStringExtra("NAME"));
+        String aux = intent.getStringExtra("NAME");
+        name.setText(aux.substring(0, 1).toUpperCase() + aux.substring(1));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(("https://pokeapi.co/api/v2/"))
@@ -54,14 +55,14 @@ public class ViewPokemon extends AppCompatActivity {
 
         PokemonAPIService pokemonAPIService = retrofit.create(PokemonAPIService.class);
 
-        pokemonAPIService.getPokemon(name.getText().toString()).enqueue(new Callback<Pokemon>() {
+        pokemonAPIService.getPokemon(aux).enqueue(new Callback<Pokemon>() {
             @Override
             public void onResponse(Call<Pokemon> call, Response<Pokemon> response) {
                 Pokemon p = response.body();
                 Glide.with(getApplicationContext()).load(p.getSprites().front_default).into(normal_img);
                 Glide.with(getApplicationContext()).load(p.getSprites().front_shiny).into(shiny_img);
-                weight.setText("Peso: " + String.valueOf(p.getWeight()/10) + "kg");
-                height.setText("Altura: " + String.valueOf(p.getHeight()/10) + "m");
+                weight.setText(String.valueOf(p.getWeight()/10) + "kg");
+                height.setText(String.valueOf(p.getHeight()/10) + "m");
 
                 String aux = p.getTypes().get(0).type.name.substring(0, 1).toUpperCase() + p.getTypes().get(0).type.name.substring(1);
                 for(int i = 1; i<p.getTypes().size(); i++){

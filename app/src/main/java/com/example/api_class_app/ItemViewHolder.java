@@ -10,16 +10,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ItemViewHolder extends RecyclerView.ViewHolder{
 
-    private ImageView itemImg;
+    ImageView itemImg;
 
-    private TextView name, effect;
+    TextView name, category, effect;
 
-    private CardView cardView;
+    CardView cardView;
 
     public ItemViewHolder(@NonNull View itemView) {
         super(itemView);
         this.itemImg = itemView.findViewById(R.id.item_img);
         this.name = itemView.findViewById(R.id.item_name);
+        this.category = itemView.findViewById(R.id.item_category);
         this.effect = itemView.findViewById(R.id.item_effect);
         this.cardView = itemView.findViewById(R.id.main_containerI);
     }

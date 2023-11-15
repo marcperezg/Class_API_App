@@ -33,7 +33,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -43,17 +42,20 @@
                 android:layout_marginRight="20dp"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/normalPoke_txt"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Normal" />
-
                 <ImageView
                     android:id="@+id/normalPoke_img"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:scaleType="centerCrop" />
+
+                <TextView
+                    android:id="@+id/normalPoke_txt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Normal"
+                    android:alpha="0.85"/>
+
             </LinearLayout>
 
             <LinearLayout
@@ -61,51 +63,33 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/shinyPoke_txt"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Shiny" />
-
                 <ImageView
                     android:id="@+id/shinyPoke_img"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:scaleType="centerCrop" />
+
+                <TextView
+                    android:id="@+id/shinyPoke_txt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Shiny"
+                    android:alpha="0.85"/>
+
             </LinearLayout>
 
         </LinearLayout>
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/viewPokeName_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
             android:layout_marginBottom="25dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/viewPokeName_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="25dp"
-                android:text="Name"
-                android:textSize="22dp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/viewPokeWeight_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="25dp"
-                android:text="Peso"
-                android:textSize="15dp" />
-
-            <TextView
-                android:id="@+id/viewPokeHeight_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Altura"
-                android:textSize="15dp" />
-        </LinearLayout>
+            android:text="Name"
+            android:textSize="22dp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -113,6 +97,40 @@
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/fixWeight_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:alpha="0.85"
+                android:text="Peso"
+                android:textSize="13sp"/>
+
+            <TextView
+                android:id="@+id/viewPokeWeight_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="Peso"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/fixHeight_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:alpha="0.85"
+                android:text="Altura"
+                android:textSize="13sp"/>
+
+            <TextView
+                android:id="@+id/viewPokeHeight_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="Altura"
+                android:textSize="15dp" />
 
             <TextView
                 android:id="@+id/fixTypes_txt"
@@ -127,7 +145,7 @@
                 android:id="@+id/viewPokeTypes_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="25dp"
+                android:layout_marginBottom="20dp"
                 android:text="Tipos"
                 android:textSize="15sp" />
 
@@ -144,31 +162,29 @@
                 android:id="@+id/viewPokeExp_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="25dp"
+                android:layout_marginBottom="20dp"
                 android:text="Experiencia"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/fixAbilities_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:alpha="0.85"
+                android:text="Habilidades"
+                android:textSize="13sp"/>
+
+            <TextView
+                android:id="@+id/viewPokeAbilities_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Habilidades"
                 android:textSize="15sp" />
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/fixAbilities_txt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="1dp"
-            android:alpha="0.85"
-            android:text="Habilidades"
-            android:textSize="13sp"/>
 
-        <TextView
-            android:id="@+id/viewPokeAbilities_txt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:text="Habilidades"
-            android:textSize="15sp" />
 
     </LinearLayout>
 

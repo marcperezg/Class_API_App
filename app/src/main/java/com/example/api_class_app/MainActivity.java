@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.api_class_app.fragments.ItemViewFragment;
 import com.example.api_class_app.fragments.PokemonViewFragment;
 
 import retrofit2.Call;
@@ -35,12 +36,17 @@ public class MainActivity extends AppCompatActivity{
 
     Fragment[] fragments;
 
+    boolean selected;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fragments = new Fragment[2];
         fragments[0] = new PokemonViewFragment();
+        fragments[1] = new ItemViewFragment();
         setContentView(R.layout.activity_main);
+
+        selected = false;
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -49,6 +55,12 @@ public class MainActivity extends AppCompatActivity{
         //fragmentTransaction.commit();
 
         searchInp = findViewById(R.id.search_inp);
+
+        showPoke = findViewById(R.id.pokemons_btn);
+        showPoke.setOnClickListener(buttonAction);
+
+        showItems = findViewById(R.id.items_btn);
+        showItems.setOnClickListener(buttonAction);
 
         searchBtn = findViewById(R.id.search_btn);
         searchBtn.setOnClickListener(buttonAction);
@@ -82,7 +94,7 @@ public class MainActivity extends AppCompatActivity{
                                 public void onResponse(Call<Items> call, Response<Items> response) {
                                     if (response.isSuccessful() && response.body() != null) {
                                         Items i = response.body();
-                                        Intent intent = new Intent(MainActivity.this, ViewPokemon.class);
+                                        Intent intent = new Intent(MainActivity.this, ViewItem.class);
                                         intent.putExtra("NAME", searchInp.getText().toString());
                                         startActivity(intent);
                                     } else {
@@ -107,14 +119,27 @@ public class MainActivity extends AppCompatActivity{
                     }
                 });
             }
-            /* else if (id == showItems.getId()) {
-
+            else if (id == showItems.getId()) {
+                selected = true;
+                setUpFragment();
             } else {
-
+                selected = false;
+                setUpFragment();
             }
-            */
+
         }
 
 
     };
+
+    void setUpFragment (){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        if(selected) {
+            fragmentTransaction.replace(R.id.fragmentContainerView, fragments[1]);
+        } else {
+            fragmentTransaction.replace(R.id.fragmentContainerView, fragments[0]);
+        }
+        fragmentTransaction.commit();
+    }
 }
