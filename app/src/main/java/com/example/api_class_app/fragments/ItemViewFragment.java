@@ -29,6 +29,7 @@ import com.example.api_class_app.ViewItem;
 import com.example.api_class_app.ViewPokemon;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -82,6 +83,7 @@ public class ItemViewFragment extends Fragment implements SelectListener {
                                     if (item_list.size() == results.size()) { // Verifica si todos los detalles han sido agregados.
                                         // Actualiza el adaptador en el hilo de UI
                                         getActivity().runOnUiThread(() -> {
+                                            item_list.sort((p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()));
                                             ItemViewAdapter itemViewAdapter = new ItemViewAdapter(context, item_list, ItemViewFragment.this);
                                             recyclerView.setAdapter(itemViewAdapter);
                                         });

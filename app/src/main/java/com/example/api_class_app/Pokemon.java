@@ -12,6 +12,8 @@ public class Pokemon {
 
     private int base_experience;
 
+    private int id;
+
     private Sprites sprites;
 
     private List<TypesData> types;
@@ -59,6 +61,8 @@ public class Pokemon {
     public int getBase_experience() {
         return base_experience;
     }
+
+    public int getID() { return id; }
 
     public Sprites getSprites() { return sprites; }
     public List<TypesData> getTypes() { return types; }

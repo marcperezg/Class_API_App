@@ -78,6 +78,7 @@ public class PokemonViewFragment extends Fragment implements SelectListener {
                                     if (poke_list.size() == results.size()) { // Verifica si todos los detalles han sido agregados.
                                         // Actualiza el adaptador en el hilo de UI
                                         getActivity().runOnUiThread(() -> {
+                                            poke_list.sort((p1, p2) -> Integer.compare(p1.getID(), p2.getID()));
                                             PokemonViewAdapter pokemonViewAdapter = new PokemonViewAdapter(context, poke_list, PokemonViewFragment.this);
                                             recyclerView.setAdapter(pokemonViewAdapter);
                                         });
