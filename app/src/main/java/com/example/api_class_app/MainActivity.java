@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +29,9 @@ public class MainActivity extends AppCompatActivity{
 
     EditText searchInp;
 
-    Button searchBtn, showPoke, showItems;
+    Button showPoke, showItems;
+
+    ImageButton searchBtn;
 
     Fragment[] fragments;
 
@@ -45,16 +48,17 @@ public class MainActivity extends AppCompatActivity{
         fragmentTransaction.replace(R.id.fragmentContainerView, fragments[0]);
         //fragmentTransaction.commit();
 
+        searchInp = findViewById(R.id.search_inp);
 
-        //Button b = (Button) findViewById(R.id.call_api_btn);
+        searchBtn = findViewById(R.id.search_btn);
+        searchBtn.setOnClickListener(buttonAction);
+    }
 
-        //imageView = findViewById(R.id.poke_img);
-
-        //textView = findViewById(R.id.poke_name);
-        /*
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    protected View.OnClickListener buttonAction = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int id = v.getId();
+            if(id == searchBtn.getId()){
                 Retrofit retrofit = new Retrofit.Builder()
                         .baseUrl(("https://pokeapi.co/api/v2/"))
                         .addConverterFactory(GsonConverterFactory.create())
@@ -62,21 +66,55 @@ public class MainActivity extends AppCompatActivity{
 
                 PokemonAPIService pokemonAPIService = retrofit.create(PokemonAPIService.class);
 
-                pokemonAPIService.getPokemon("ditto").enqueue(new Callback<Pokemon>() {
+                String url = "https://pokeapi.co/api/v2/pokemon/" + searchInp.getText().toString().toLowerCase();
+                pokemonAPIService.getPokemonDetails(url).enqueue(new Callback<Pokemon>() {
                     @Override
                     public void onResponse(Call<Pokemon> call, Response<Pokemon> response) {
-                        Pokemon p = response.body();
-                        Glide.with(getApplicationContext()).load(p.sprites.front_default).into(imageView);
-                        textView.setText(p.name);
+                        if (response.isSuccessful() && response.body() != null) {
+                            Pokemon p = response.body();
+                            Intent intent = new Intent(MainActivity.this, ViewPokemon.class);
+                            intent.putExtra("NAME", searchInp.getText().toString());
+                            startActivity(intent);
+                        } else {
+                            String iturl = "https://pokeapi.co/api/v2/item/" + searchInp.getText().toString().toLowerCase();
+                            pokemonAPIService.getItemDetails(iturl).enqueue(new Callback<Items>() {
+                                @Override
+                                public void onResponse(Call<Items> call, Response<Items> response) {
+                                    if (response.isSuccessful() && response.body() != null) {
+                                        Items i = response.body();
+                                        Intent intent = new Intent(MainActivity.this, ViewPokemon.class);
+                                        intent.putExtra("NAME", searchInp.getText().toString());
+                                        startActivity(intent);
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "No existe", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<Items> call, Throwable throwable) {
+                                    Toast.makeText(MainActivity.this, "No encontrado", Toast.LENGTH_SHORT).show();
+                                    //Log.e("PokemonViewFragment", "Error al obtener la lista de Pokémon", throwable);
+                                }
+                            });
+                            Toast.makeText(MainActivity.this, "No existe", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     @Override
                     public void onFailure(Call<Pokemon> call, Throwable throwable) {
-                        Toast.makeText(MainActivity.this, "No va", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "No encontrado", Toast.LENGTH_SHORT).show();
+                        //Log.e("PokemonViewFragment", "Error al obtener la lista de Pokémon", throwable);
                     }
                 });
             }
-        });
-         */
-    }
+            /* else if (id == showItems.getId()) {
+
+            } else {
+
+            }
+            */
+        }
+
+
+    };
 }

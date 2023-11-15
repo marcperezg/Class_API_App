@@ -19,14 +19,12 @@ public interface PokemonAPIService {
     Call<Pokemon> getPokemonDetails(@Url String url);
 
     @GET("item/")
-    Call<List<Results>> getAllItems();
+    Call<ApiResponse> getAllItems();
 
-    /*
-    @GET("item/{t_name}")
-    Call<Items> getItem(@Path("t_name") String name);
-    */
+    @GET("item/{i_name}")
+    Call<Items> getItem(@Path("i_name") String name);
 
-    // Exemple
-    @GET("pokemon/ditto")
-    Call<Pokemon> getPokemonDitto();
+    @GET
+    Call<Items> getItemDetails(@Url String url);
+
 }
