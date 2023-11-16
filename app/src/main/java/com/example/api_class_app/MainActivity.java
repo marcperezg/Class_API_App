@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity{
 
     Fragment[] fragments;
 
-    boolean selected;
+    int selected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,15 +47,17 @@ public class MainActivity extends AppCompatActivity{
         fragments[1] = new ItemViewFragment();
         setContentView(R.layout.activity_main);
 
-        selected = false;
+        selected = 0;
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        fragmentTransaction.replace(R.id.fragmentContainerView, fragments[0]);
-        //fragmentTransaction.commit();
+        fragmentTransaction.replace(R.id.fragmentContainerView, fragments[DataHolder.getInstance().getSavedFragment()]);
+
+        fragmentTransaction.commit();
 
         searchInp = findViewById(R.id.search_inp);
+        searchInp.setOnClickListener(buttonAction);
 
         showPoke = findViewById(R.id.pokemons_btn);
         showPoke.setOnClickListener(buttonAction);
@@ -69,8 +72,10 @@ public class MainActivity extends AppCompatActivity{
     protected View.OnClickListener buttonAction = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            searchInp.setCursorVisible(false);
             int id = v.getId();
-            if(id == searchBtn.getId()){
+            if(id == searchBtn.getId() && !searchInp.getText().toString().isEmpty()){
+                Log.e("ERROR", searchInp.getText().toString());
                 Retrofit retrofit = new Retrofit.Builder()
                         .baseUrl(("https://pokeapi.co/api/v2/"))
                         .addConverterFactory(GsonConverterFactory.create())
@@ -84,8 +89,10 @@ public class MainActivity extends AppCompatActivity{
                     public void onResponse(Call<Pokemon> call, Response<Pokemon> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             Pokemon p = response.body();
+                            DataHolder.getInstance().setSavedPokemon(p);
                             Intent intent = new Intent(MainActivity.this, ViewPokemon.class);
-                            intent.putExtra("NAME", searchInp.getText().toString());
+                            intent.putExtra("NAME", "");
+                            intent.putExtra("SAVED", true);
                             startActivity(intent);
                         } else {
                             String iturl = "https://pokeapi.co/api/v2/item/" + searchInp.getText().toString().toLowerCase();
@@ -94,8 +101,10 @@ public class MainActivity extends AppCompatActivity{
                                 public void onResponse(Call<Items> call, Response<Items> response) {
                                     if (response.isSuccessful() && response.body() != null) {
                                         Items i = response.body();
+                                        DataHolder.getInstance().setSavedItem(i);
                                         Intent intent = new Intent(MainActivity.this, ViewItem.class);
-                                        intent.putExtra("NAME", searchInp.getText().toString());
+                                        intent.putExtra("NAME", "");
+                                        intent.putExtra("SAVED", true);
                                         startActivity(intent);
                                     } else {
                                         Toast.makeText(MainActivity.this, "No existe", Toast.LENGTH_SHORT).show();
@@ -108,7 +117,6 @@ public class MainActivity extends AppCompatActivity{
                                     //Log.e("PokemonViewFragment", "Error al obtener la lista de Pokémon", throwable);
                                 }
                             });
-                            Toast.makeText(MainActivity.this, "No existe", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -120,11 +128,13 @@ public class MainActivity extends AppCompatActivity{
                 });
             }
             else if (id == showItems.getId()) {
-                selected = true;
+                selected = 1;
+                setUpFragment();
+            } else if (id == showPoke.getId()) {
+                selected = 0;
                 setUpFragment();
             } else {
-                selected = false;
-                setUpFragment();
+                searchInp.setCursorVisible(true);
             }
 
         }
@@ -133,13 +143,10 @@ public class MainActivity extends AppCompatActivity{
     };
 
     void setUpFragment (){
+        DataHolder.getInstance().setSavedFragment(selected);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        if(selected) {
-            fragmentTransaction.replace(R.id.fragmentContainerView, fragments[1]);
-        } else {
-            fragmentTransaction.replace(R.id.fragmentContainerView, fragments[0]);
-        }
+        fragmentTransaction.replace(R.id.fragmentContainerView, fragments[selected]);
         fragmentTransaction.commit();
     }
 }

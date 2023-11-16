@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.api_class_app.ApiResponse;
+import com.example.api_class_app.DataHolder;
 import com.example.api_class_app.ItemViewAdapter;
 import com.example.api_class_app.Items;
 import com.example.api_class_app.Pokemon;
@@ -52,66 +53,74 @@ public class ItemViewFragment extends Fragment implements SelectListener {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle bundle) {
-        item_list = new ArrayList<>();
-        results = new ArrayList<>();
         Context context = view.getContext();
         recyclerView = view.findViewById(R.id.itemRecyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(context, 1));
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(("https://pokeapi.co/api/v2/"))
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        if(item_list.isEmpty()) {
 
-        PokemonAPIService pokemonAPIService = retrofit.create(PokemonAPIService.class);
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(("https://pokeapi.co/api/v2/"))
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
 
-        pokemonAPIService.getAllItems().enqueue(new Callback<ApiResponse>() {
-            @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    results = response.body().getResults();
-                    for (Results r : results) {
-                        Log.d("ItemViewFragment", "Fetching details for URL: " + r.getUrl());
+            PokemonAPIService pokemonAPIService = retrofit.create(PokemonAPIService.class);
 
-                        pokemonAPIService.getItemDetails(r.getUrl()).enqueue(new Callback<Items>() {
-                            @Override
-                            public void onResponse(Call<Items> call, Response<Items> response) {
-                                if (response.isSuccessful() && response.body() != null) {
-                                    Items i = response.body();
-                                    item_list.add(i);
-                                    if (item_list.size() == results.size()) { // Verifica si todos los detalles han sido agregados.
-                                        // Actualiza el adaptador en el hilo de UI
-                                        getActivity().runOnUiThread(() -> {
-                                            item_list.sort((p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()));
-                                            ItemViewAdapter itemViewAdapter = new ItemViewAdapter(context, item_list, ItemViewFragment.this);
-                                            recyclerView.setAdapter(itemViewAdapter);
-                                        });
+            pokemonAPIService.getAllItems().enqueue(new Callback<ApiResponse>() {
+                @Override
+                public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        results = response.body().getResults();
+                        for (Results r : results) {
+                            Log.d("ItemViewFragment", "Fetching details for URL: " + r.getUrl());
+
+                            pokemonAPIService.getItemDetails(r.getUrl()).enqueue(new Callback<Items>() {
+                                @Override
+                                public void onResponse(Call<Items> call, Response<Items> response) {
+                                    if (response.isSuccessful() && response.body() != null) {
+                                        Items i = response.body();
+                                        item_list.add(i);
+                                        if (item_list.size() == results.size()) { // Verifica si todos los detalles han sido agregados.
+                                            // Actualiza el adaptador en el hilo de UI
+                                            getActivity().runOnUiThread(() -> {
+                                                item_list.sort((p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()));
+                                                DataHolder.getInstance().setItemsList(item_list);
+                                                setUpAdapter(context);
+                                            });
+                                        }
                                     }
                                 }
-                            }
 
-                            @Override
-                            public void onFailure(Call<Items> call, Throwable t) {
-                                Log.e("ItemViewFragment", "Failed to fetch item details", t);
-                                Toast.makeText(context, "Error al obtener detalles de Items", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                                @Override
+                                public void onFailure(Call<Items> call, Throwable t) {
+                                    Log.e("ItemViewFragment", "Failed to fetch item details", t);
+                                    Toast.makeText(context, "Error al obtener detalles de Items", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<ApiResponse> call, Throwable throwable) {
-                Toast.makeText(context, "Error al obtener la lista de Pokémon", Toast.LENGTH_SHORT).show();
-                //Log.e("PokemonViewFragment", "Error al obtener la lista de Pokémon", throwable);
-            }
-        });
+                @Override
+                public void onFailure(Call<ApiResponse> call, Throwable throwable) {
+                    Toast.makeText(context, "Error al obtener la lista de Pokémon", Toast.LENGTH_SHORT).show();
+                    //Log.e("PokemonViewFragment", "Error al obtener la lista de Pokémon", throwable);
+                }
+            });
+        } else {
+            setUpAdapter(view.getContext());
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        item_list = new ArrayList<>();
+        results = new ArrayList<>();
+
+        if(!DataHolder.getInstance().getItemsList().isEmpty()) item_list = DataHolder.getInstance().getItemsList();
+
     }
 
     @Override
@@ -122,8 +131,14 @@ public class ItemViewFragment extends Fragment implements SelectListener {
 
     @Override
     public void OnItemClicked(Context context, String name) {
+        DataHolder.getInstance().setSavedFragment(1);
         Intent intent = new Intent(context, ViewItem.class);
         intent.putExtra("NAME", name);
         context.startActivity(intent);
+    }
+
+    private void setUpAdapter (Context context){
+        ItemViewAdapter itemViewFragment = new ItemViewAdapter(context, item_list, ItemViewFragment.this);
+        recyclerView.setAdapter(itemViewFragment);
     }
 }

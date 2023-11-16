@@ -42,30 +42,19 @@ public class ViewItem extends AppCompatActivity {
         back.setOnClickListener(goBack);
 
         Intent intent = getIntent();
-        name.setText(intent.getStringExtra("NAME"));
+        Items i;
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(("https://pokeapi.co/api/v2/"))
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        if(intent.getBooleanExtra("SAVED", false)) {
+            i = DataHolder.getInstance().getSavedItem();
+        } else {
+            i = DataHolder.getInstance().getItem(intent.getStringExtra("NAME"));
+        }
 
-        PokemonAPIService pokemonAPIService = retrofit.create(PokemonAPIService.class);
-
-        pokemonAPIService.getItem(name.getText().toString()).enqueue(new Callback<Items>() {
-            @Override
-            public void onResponse(Call<Items> call, Response<Items> response) {
-                Items i = response.body();
-                Glide.with(getApplicationContext()).load(i.getSprites().defaultSprite).into(normal_img);
-                cost.setText(String.valueOf(i.getCost()) + " Monedas");
-                category.setText(i.getCategory().name.substring(0, 1).toUpperCase() + i.getCategory().name.substring(1));
-                utilities.setText(i.getFlavor_text_entries().get(42).text);
-            }
-
-            @Override
-            public void onFailure(Call<Items> call, Throwable throwable) {
-                Toast.makeText(ViewItem.this, "Error al conectar amb API", Toast.LENGTH_SHORT).show();
-            }
-        });
+        Glide.with(getApplicationContext()).load(i.getSprites().defaultSprite).into(normal_img);
+        name.setText(i.getName().substring(0, 1).toUpperCase() + i.getName().substring(1));
+        cost.setText(String.valueOf(i.getCost()) + " Monedas");
+        category.setText(i.getCategory().name.substring(0, 1).toUpperCase() + i.getCategory().name.substring(1));
+        utilities.setText(i.getFlavor_text_entries().get(42).text);
 
     }
 
