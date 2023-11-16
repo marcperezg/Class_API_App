@@ -45,46 +45,33 @@ public class ViewPokemon extends AppCompatActivity {
         back.setOnClickListener(goBack);
 
         Intent intent = getIntent();
-        String aux = intent.getStringExtra("NAME");
-        name.setText(aux.substring(0, 1).toUpperCase() + aux.substring(1));
+        Pokemon p;
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(("https://pokeapi.co/api/v2/"))
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        if(intent.getBooleanExtra("SAVED", false)){
+            p = DataHolder.getInstance().getSavedPokemon();
+        } else {
+            p = DataHolder.getInstance().getPokemon(intent.getStringExtra("NAME"));
+        }
 
-        PokemonAPIService pokemonAPIService = retrofit.create(PokemonAPIService.class);
+        Glide.with(getApplicationContext()).load(p.getSprites().front_default).into(normal_img);
+        Glide.with(getApplicationContext()).load(p.getSprites().front_shiny).into(shiny_img);
+        name.setText(p.getName().substring(0, 1).toUpperCase() + p.getName().substring(1));
+        weight.setText(String.valueOf(p.getWeight()/10) + "kg");
+        height.setText(String.valueOf(p.getHeight()/10) + "m");
 
-        pokemonAPIService.getPokemon(aux).enqueue(new Callback<Pokemon>() {
-            @Override
-            public void onResponse(Call<Pokemon> call, Response<Pokemon> response) {
-                Pokemon p = response.body();
-                Glide.with(getApplicationContext()).load(p.getSprites().front_default).into(normal_img);
-                Glide.with(getApplicationContext()).load(p.getSprites().front_shiny).into(shiny_img);
-                weight.setText(String.valueOf(p.getWeight()/10) + "kg");
-                height.setText(String.valueOf(p.getHeight()/10) + "m");
+        String aux = p.getTypes().get(0).type.name.substring(0, 1).toUpperCase() + p.getTypes().get(0).type.name.substring(1);
+        for(int i = 1; i<p.getTypes().size(); i++){
+            aux = aux + ", " + p.getTypes().get(i).type.name.substring(0, 1).toUpperCase() + p.getTypes().get(i).type.name.substring(1);
+        }
+        types.setText(aux);
 
-                String aux = p.getTypes().get(0).type.name.substring(0, 1).toUpperCase() + p.getTypes().get(0).type.name.substring(1);
-                for(int i = 1; i<p.getTypes().size(); i++){
-                    aux = aux + ", " + p.getTypes().get(i).type.name.substring(0, 1).toUpperCase() + p.getTypes().get(i).type.name.substring(1);
-                }
-                types.setText(aux);
+        exp.setText(String.valueOf(p.getBase_experience()) + "xp");
 
-                exp.setText(String.valueOf(p.getBase_experience()) + "xp");
-
-                aux = p.getAbilities().get(0).ability.name.substring(0, 1).toUpperCase() + p.getAbilities().get(0).ability.name.substring(1);
-                for(int i = 1; i<p.getAbilities().size(); i++){
-                    aux = aux + ", " + p.getAbilities().get(i).ability.name.substring(0, 1).toUpperCase() + p.getAbilities().get(i).ability.name.substring(1);;
-                }
-                abilities.setText(aux);
-
-            }
-
-            @Override
-            public void onFailure(Call<Pokemon> call, Throwable throwable) {
-                Toast.makeText(ViewPokemon.this, "Error al conectar amb API", Toast.LENGTH_SHORT).show();
-            }
-        });
+        aux = p.getAbilities().get(0).ability.name.substring(0, 1).toUpperCase() + p.getAbilities().get(0).ability.name.substring(1);
+        for(int i = 1; i<p.getAbilities().size(); i++){
+            aux = aux + ", " + p.getAbilities().get(i).ability.name.substring(0, 1).toUpperCase() + p.getAbilities().get(i).ability.name.substring(1);;
+        }
+        abilities.setText(aux);
     }
 
     protected View.OnClickListener goBack = new View.OnClickListener() {

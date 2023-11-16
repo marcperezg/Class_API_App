@@ -48,10 +48,17 @@ public class MainActivity extends AppCompatActivity{
 
         selected = false;
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        fragmentTransaction.replace(R.id.fragmentContainerView, fragments[0]);
+        DataHolder.getInstance().setOnDataLoadedListener(new DataHolder.OnDataLoadedListener() {
+            @Override
+            public void onDataLoaded() {
+                runOnUiThread(() -> {
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.fragmentContainerView, fragments[0]);
+                    fragmentTransaction.commit();
+                });
+            }
+        });
         //fragmentTransaction.commit();
 
         searchInp = findViewById(R.id.search_inp);
@@ -84,8 +91,10 @@ public class MainActivity extends AppCompatActivity{
                     public void onResponse(Call<Pokemon> call, Response<Pokemon> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             Pokemon p = response.body();
+                            DataHolder.getInstance().setSavedPokemon(p);
                             Intent intent = new Intent(MainActivity.this, ViewPokemon.class);
-                            intent.putExtra("NAME", searchInp.getText().toString());
+                            intent.putExtra("NAME", "");
+                            intent.putExtra("SAVED", true);
                             startActivity(intent);
                         } else {
                             String iturl = "https://pokeapi.co/api/v2/item/" + searchInp.getText().toString().toLowerCase();
@@ -94,8 +103,10 @@ public class MainActivity extends AppCompatActivity{
                                 public void onResponse(Call<Items> call, Response<Items> response) {
                                     if (response.isSuccessful() && response.body() != null) {
                                         Items i = response.body();
+                                        DataHolder.getInstance().setSavedItem(i);
                                         Intent intent = new Intent(MainActivity.this, ViewItem.class);
-                                        intent.putExtra("NAME", searchInp.getText().toString());
+                                        intent.putExtra("NAME", "");
+                                        intent.putExtra("SAVED", true);
                                         startActivity(intent);
                                     } else {
                                         Toast.makeText(MainActivity.this, "No existe", Toast.LENGTH_SHORT).show();
@@ -128,7 +139,6 @@ public class MainActivity extends AppCompatActivity{
             }
 
         }
-
 
     };
 

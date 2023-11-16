@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.api_class_app.ApiResponse;
+import com.example.api_class_app.DataHolder;
 import com.example.api_class_app.Pokemon;
 import com.example.api_class_app.PokemonAPIService;
 import com.example.api_class_app.PokemonViewAdapter;
@@ -41,7 +42,7 @@ public class PokemonViewFragment extends Fragment implements SelectListener {
 
     private List<Pokemon> poke_list;
 
-    private List<Results> results;
+    private PokemonViewAdapter pokemonViewAdapter;
 
     public PokemonViewFragment() {
         // Required empty public constructor
@@ -49,64 +50,25 @@ public class PokemonViewFragment extends Fragment implements SelectListener {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle bundle) {
-        poke_list = new ArrayList<>();
-        results = new ArrayList<>();
-        Context context = view.getContext();
         recyclerView = view.findViewById(R.id.pokemonRecyclerView);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(context, 1));
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(("https://pokeapi.co/api/v2/"))
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        PokemonAPIService pokemonAPIService = retrofit.create(PokemonAPIService.class);
-
-        pokemonAPIService.getAllPokemon().enqueue(new Callback<ApiResponse>() {
-            @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    results = response.body().getResults();
-                    for (Results r : results) {
-                        pokemonAPIService.getPokemonDetails(r.getUrl()).enqueue(new Callback<Pokemon>() {
-                            @Override
-                            public void onResponse(Call<Pokemon> call, Response<Pokemon> response) {
-                                if (response.isSuccessful() && response.body() != null) {
-                                    Pokemon p = response.body();
-                                    poke_list.add(p);
-                                    if (poke_list.size() == results.size()) { // Verifica si todos los detalles han sido agregados.
-                                        // Actualiza el adaptador en el hilo de UI
-                                        getActivity().runOnUiThread(() -> {
-                                            poke_list.sort((p1, p2) -> Integer.compare(p1.getID(), p2.getID()));
-                                            PokemonViewAdapter pokemonViewAdapter = new PokemonViewAdapter(context, poke_list, PokemonViewFragment.this);
-                                            recyclerView.setAdapter(pokemonViewAdapter);
-                                        });
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Pokemon> call, Throwable t) {
-                                Toast.makeText(context, "Error al obtener detalles de Pokemon", Toast.LENGTH_SHORT).show();
-                                //Log.e("PokemonViewFragment", "Error al obtener detalles de Pokemon", t);
-                            }
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse> call, Throwable throwable) {
-                Toast.makeText(context, "Error al obtener la lista de Pokémon", Toast.LENGTH_SHORT).show();
-                //Log.e("PokemonViewFragment", "Error al obtener la lista de Pokémon", throwable);
-            }
-        });
+        recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), 1));
+        recyclerView.setAdapter(pokemonViewAdapter);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        poke_list = new ArrayList<>();
+        Context context = getContext();
+        poke_list = DataHolder.getInstance().getPokemonList(context);
+        if (!poke_list.isEmpty()) { // Verifica si todos los detalles han sido agregados.
+            DataHolder.getInstance().notifyDataLoaded(0);
+            getActivity().runOnUiThread(() -> {
+                pokemonViewAdapter = new PokemonViewAdapter(context, poke_list, PokemonViewFragment.this);
+            });
+        }
+
     }
 
     @Override
