@@ -9,10 +9,10 @@ import retrofit2.http.Path;
 import retrofit2.http.Url;
 
 public interface PokemonAPIService {
-    @GET("pokemon/")
-    Call<ApiResponse> getAllPokemon();
+    @GET
+    Call<ApiResponse> getAllPokemon(@Url String url);
 
-    @GET("pokemon/{p_name}")
+    @GET("{p_name}")
     Call<Pokemon> getPokemon(@Path("p_name") String name);
 
     @GET
